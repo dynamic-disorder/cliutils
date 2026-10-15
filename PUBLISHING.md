@@ -117,11 +117,11 @@ check the package page before concluding that a push failed.
 
 ## Versioning, and the one consumer
 
-Exactly one repository consumes this package: **csv-translations**, through Central Package
+Exactly one consumer pins this package: the **prototype-k** umbrella, whose `CsvTranslations/` tree uses Central Package
 Management. A release therefore needs a matching change there:
 
 ```xml
-<!-- csv-translations/Directory.Packages.props -->
+<!-- prototype-k/CsvTranslations/Directory.Packages.props -->
 <PackageVersion Include="DynamicDisorder.CliUtils" Version="0.1.0" />
 ```
 
