@@ -22,7 +22,7 @@
     <Authors>dynamic-disorder</Authors>
     <Description>Shared console output utilities for CLI applications: colored output helpers, Spectre.Console wrappers, and an in-memory logger.</Description>
     <PackageTags>console;cli;spectre;logging</PackageTags>
-    <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/dynamic-disorder/cliutils</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
