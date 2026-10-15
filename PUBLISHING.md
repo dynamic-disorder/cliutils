@@ -78,8 +78,8 @@ for **one hour** and usable **once**.
    | Repository Owner | `dynamic-disorder` |
    | Repository | `cliutils` |
    | Workflow File | `publish.yml` - the file name only, not the `.github/workflows/` path |
-   | Environment | leave empty; the workflow declares none |
-   | Scope | *Push new packages and package versions* |
+   | Environment | `production` - must match the workflow's `environment:` value exactly, or the OIDC token will not match the policy |
+   | Scope | tick *Push new packages and package versions* - the first publish creates the ID, so the versions-only scope would reject it |
    | Glob pattern | `DynamicDisorder.*` |
 
 2. Add a repository secret named `NUGET_USER` holding the nuget.org **profile name** - not the email

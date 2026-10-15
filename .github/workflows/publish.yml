@@ -19,6 +19,9 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Must match the Environment field of the nuget.org trusted-publishing policy, or the OIDC
+    # token will not match the policy. An environment also lets you require approval here.
+    environment: production
     steps:
       - name: Check out the tagged commit
         uses: actions/checkout@v4
