@@ -22,8 +22,16 @@ resolved instead of this one.
 
 1. A nuget.org account.
 2. An API key from <https://www.nuget.org/account/apikeys>:
-   - **Scope**: *Push new packages and package versions*
-   - **Glob pattern**: `DynamicDisorder.CliUtils` (or `*`)
+   - **Scope**: *Push new packages and package versions* — the "new packages" variant is required,
+     because the first publish creates the ID rather than adding a version to it
+   - **Glob pattern**: `DynamicDisorder.*` covers this package and any later one under the same
+     prefix. `DynamicDisorder.CliUtils` is the tightest scope; `*` allows every package on the
+     account. Patterns are case-insensitive, and per
+     [nuget.org's scoped-key documentation](https://learn.microsoft.com/en-us/nuget/nuget-org/scoped-api-keys)
+     a pattern also applies to *new* packages, so an empty match list for an unpublished ID is
+     expected rather than a problem
+   - The key is displayed once, so copy it immediately, and give it an expiry — nuget.org emails a
+     warning ten days before it lapses
 3. Keep the key out of this repository: pass it on the command line or read it from a secret store.
    Never commit it, and never put it in a `nuget.config`.
 
