@@ -15,7 +15,7 @@ logging, Spectre.Console wrappers). No standalone entry point — consumed via
 
 ## Commands
 
-- **Build**: `dotnet build CliUtils/CliUtils.csproj` (from repo root)
+- **Build**: `dotnet build CliUtils.csproj` (from repo root)
 - **Test**: no test project
 
 ## Conventions
@@ -23,7 +23,7 @@ logging, Spectre.Console wrappers). No standalone entry point — consumed via
 - .NET 10.0; build settings live in `CliUtils.csproj` — this repository carries no repo-wide `Directory.Build.props`.
 - Dependency: Spectre.Console 0.57.2.
 - Consumers: `CsvTranslations/` apps (OllamaTranslatorApp, TextToSpeechApp, etc.)
-- Builds identically on Windows and Linux (`dotnet build CliUtils/CliUtils.csproj`);
+- Builds identically on Windows and Linux (`dotnet build CliUtils.csproj`);
   it is also built as a project of `CsvTranslations.sln`.
 
 ## Gotchas

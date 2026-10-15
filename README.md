@@ -19,4 +19,4 @@ A shared .NET 10 class library providing enhanced console output utilities for C
 This library is referenced as a `ProjectReference` by other projects in the repository. Build the solution or project that depends on it — there is no standalone entry point.
 
 ```bash
-dotnet build CliUtils/CliUtils.csproj
+dotnet build CliUtils.csproj
