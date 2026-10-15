@@ -45,10 +45,14 @@ jobs:
           user: ${{ secrets.NUGET_USER }}   # the nuget.org profile name, not the email address
 
       - name: Push the package and its symbols
+        env:
+          PACKAGE: DynamicDisorder.CliUtils.${{ steps.version.outputs.value }}
         run: |
-          dotnet nuget push "artifacts/*.nupkg" \
+          # Name both artifacts explicitly. A "*.nupkg" glob also matches the ".snupkg" beside it:
+          # the first release pushed the symbols twice and logged a spurious conflict.
+          dotnet nuget push "artifacts/$PACKAGE.nupkg" \
             --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
             --source https://api.nuget.org/v3/index.json --skip-duplicate
-          dotnet nuget push "artifacts/*.snupkg" \
+          dotnet nuget push "artifacts/$PACKAGE.snupkg" \
             --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
             --source https://api.nuget.org/v3/index.json --skip-duplicate
