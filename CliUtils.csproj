@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>NU1605</WarningsNotAsErrors>
+    <RootNamespace>CliUtils</RootNamespace>
+    <AssemblyName>CliUtils</AssemblyName>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!-- NuGet package metadata. The id is prefixed because plain `CliUtils` is taken on
+         nuget.org; the version is bumped deliberately per release. -->
+    <PackageId>DynamicDisorder.CliUtils</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>dynamic-disorder</Authors>
+    <Description>Shared console output utilities for CLI applications: colored output helpers, Spectre.Console wrappers, and an in-memory logger.</Description>
+    <PackageTags>console;cli;spectre;logging</PackageTags>
+    <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/dynamic-disorder/cliutils</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console" Version="0.57.2" />
+    <PackageReference Include="Spectre.Console.Cli" Version="0.57.2" />
+  </ItemGroup>
+
+</Project>

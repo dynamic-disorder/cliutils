@@ -1,0 +1,24 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+artifacts/
+
+# Packages - the published artifact, never the source
+*.nupkg
+*.snupkg
+
+# IDE and editor state
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+
+# OS noise
+.DS_Store
+Thumbs.db
