@@ -20,7 +20,7 @@ logging, Spectre.Console wrappers). No standalone entry point — consumed via
 
 ## Conventions
 
-- .NET 10.0, `Directory.Build.props` applies repo-wide settings.
+- .NET 10.0; build settings live in `CliUtils.csproj` — this repository carries no repo-wide `Directory.Build.props`.
 - Dependency: Spectre.Console 0.57.2.
 - Consumers: `CsvTranslations/` apps (OllamaTranslatorApp, TextToSpeechApp, etc.)
 - Builds identically on Windows and Linux (`dotnet build CliUtils/CliUtils.csproj`);
