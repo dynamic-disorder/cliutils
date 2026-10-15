@@ -22,3 +22,9 @@ artifacts/
 # OS noise
 .DS_Store
 Thumbs.db
+
+# Local agent glue and scratch - never tracked
+.claude/skills
+.claude/settings.local.json
+local_user_files/*
+!local_user_files/README.md
