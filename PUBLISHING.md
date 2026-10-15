@@ -18,7 +18,7 @@ The ID is prefixed because the unprefixed name is already taken on nuget.org. Ne
 reference an unprefixed `CliUtils` package — a different package carries that name, and it would be
 resolved instead of this one.
 
-## One-time setup
+## One-time setup - API key (only for publishing by hand)
 
 1. A nuget.org account.
 2. An API key from <https://www.nuget.org/account/apikeys>:
@@ -35,7 +35,7 @@ resolved instead of this one.
 3. Keep the key out of this repository: pass it on the command line or read it from a secret store.
    Never commit it, and never put it in a `nuget.config`.
 
-## Release
+## Release from the command line (API key)
 
 ```bash
 # On a machine where $HOME is read-only - the agent sandbox on this box - redirect the package
@@ -64,6 +64,44 @@ dotnet nuget push bin/Release/DynamicDisorder.CliUtils.<version>.snupkg \
 **Re-pack before every push.** A `.nupkg` left in `bin/` carries the metadata it was built with: an
 artifact from an earlier build here still declared the previous license, and pushing it would have
 published the wrong terms.
+
+## One-time setup - Trusted Publishing (preferred)
+
+Trusted Publishing removes the long-lived secret: the workflow asks GitHub for a short-lived OIDC
+token, nuget.org validates it against a policy you register, and returns a temporary API key valid
+for **one hour** and usable **once**.
+
+1. nuget.org -> your user name -> **Trusted Publishing** -> add a policy:
+
+   | Field | Value |
+   | :--- | :--- |
+   | Repository Owner | `dynamic-disorder` |
+   | Repository | `cliutils` |
+   | Workflow File | `publish.yml` - the file name only, not the `.github/workflows/` path |
+   | Environment | leave empty; the workflow declares none |
+   | Scope | *Push new packages and package versions* |
+   | Glob pattern | `DynamicDisorder.*` |
+
+2. Add a repository secret named `NUGET_USER` holding the nuget.org **profile name** - not the email
+   address. It is not sensitive; keeping it in a secret avoids editing the workflow if the account
+   ever changes.
+
+3. Release by tagging, below. The workflow file has to exist under its registered name, or the
+   token will not match the policy.
+
+> A policy on a **private** repository starts as temporarily active for seven days and only becomes
+> permanent after the first successful publish. This repository is public, so that does not apply.
+
+## Release from GitHub Actions (preferred)
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The workflow packs that commit with the version taken from the tag, exchanges the OIDC token for a
+temporary key, and pushes the package and its symbols. Re-running is safe: `--skip-duplicate` turns
+an already-published version into a no-op.
 
 ## Verify
 
