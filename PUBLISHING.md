@@ -40,7 +40,7 @@ resolved instead of this one.
 ```bash
 # On a machine where $HOME is read-only - the agent sandbox on this box - redirect the package
 # caches first by sourcing sandbox-env.sh from the umbrella repository's local_dev/scripts/.
-source .../local_dev/scripts/sandbox-env.sh
+source local_dev/scripts/sandbox-env.sh
 
 dotnet pack -c Release
 ```
