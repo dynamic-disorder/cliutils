@@ -81,6 +81,8 @@ for **one hour** and usable **once**.
    | Environment | `production` - must match the workflow's `environment:` value exactly, or the OIDC token will not match the policy |
    | Scope | tick *Push new packages and package versions* - the first publish creates the ID, so the versions-only scope would reject it |
    | Glob pattern | `DynamicDisorder.*` |
+   Owner and repository are the names GitHub reports **now**. This account was renamed once, and the
+   former login no longer resolves — entering it will produce a policy that can never match the token.
 
 2. Add a repository secret named `NUGET_USER` holding the nuget.org **profile name** - not the email
    address. It is not sensitive; keeping it in a secret avoids editing the workflow if the account
