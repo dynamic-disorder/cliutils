@@ -78,7 +78,7 @@ for **one hour** and usable **once**.
    | Repository Owner | `dynamic-disorder` |
    | Repository | `cliutils` |
    | Workflow File | `publish.yml` - the file name only, not the `.github/workflows/` path |
-   | Environment | `production` - must match the workflow's `environment:` value exactly, or the OIDC token will not match the policy |
+   | Environment | optional, and the validation is one-directional: **empty** means the claim is not checked, so a workflow that declares an environment still matches; a **name** must equal the workflow's `environment:` value exactly. An environment is only needed to attach approval rules or a wait timer to publishing |
    | Scope | tick *Push new packages and package versions* - the first publish creates the ID, so the versions-only scope would reject it |
    | Glob pattern | `DynamicDisorder.*` |
    Owner and repository are the names GitHub reports **now**. This account was renamed once, and the
