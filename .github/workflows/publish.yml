@@ -48,11 +48,13 @@ jobs:
         env:
           PACKAGE: DynamicDisorder.CliUtils.${{ steps.version.outputs.value }}
         run: |
-          # Name both artifacts explicitly. A "*.nupkg" glob also matches the ".snupkg" beside it:
-          # the first release pushed the symbols twice and logged a spurious conflict.
+          # Name both artifacts explicitly. A "*.nupkg" glob also matches the ".snupkg" beside it,
+          # and a plain nupkg push uploads the adjacent symbol package too: the first release pushed
+          # the symbols twice and logged a spurious conflict. --no-symbols keeps the nupkg push to
+          # the package alone, so the snupkg push below is the single symbol upload.
           dotnet nuget push "artifacts/$PACKAGE.nupkg" \
             --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
-            --source https://api.nuget.org/v3/index.json --skip-duplicate
+            --source https://api.nuget.org/v3/index.json --no-symbols --skip-duplicate
           dotnet nuget push "artifacts/$PACKAGE.snupkg" \
             --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
             --source https://api.nuget.org/v3/index.json --skip-duplicate
