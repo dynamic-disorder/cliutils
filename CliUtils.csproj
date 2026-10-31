@@ -30,7 +30,7 @@
     <!-- NuGet package metadata. The id is prefixed because plain `CliUtils` is taken on
          nuget.org; the version is bumped deliberately per release. -->
     <PackageId>DynamicDisorder.CliUtils</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>dynamic-disorder</Authors>
     <Description>Shared console output utilities for CLI applications: colored output helpers, Spectre.Console wrappers, and an in-memory logger.</Description>
     <PackageTags>console;cli;spectre;logging</PackageTags>
