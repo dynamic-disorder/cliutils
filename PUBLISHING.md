@@ -18,6 +18,43 @@ The ID is prefixed because the unprefixed name is already taken on nuget.org. Ne
 reference an unprefixed `CliUtils` package — a different package carries that name, and it would be
 resolved instead of this one.
 
+## Reproducible build and redacted paths
+
+The assembly must not carry the build machine's layout. Left alone it does: the DLL embeds the
+absolute path of its PDB in the CodeView debug record, and the PDB records absolute source paths.
+Both ship — the DLL inside the package, the PDB inside the symbols package — so a published release
+would disclose the directory structure of whichever machine built it.
+
+`CliUtils.csproj` therefore sets three properties, none of them the SDK default:
+
+| Property | Effect |
+| :--- | :--- |
+| `Deterministic` | identical inputs produce a byte-identical assembly |
+| `ContinuousIntegrationBuild` | deterministic *source* paths, so the PDB records no layout |
+| `PathMap` | maps the checkout root to the fixed placeholder `/_/` |
+
+Verify in the packed output before pushing anything. Run in PowerShell, from the repository root:
+
+```powershell
+$dll = 'bin\Release\net10.0\CliUtils.dll'
+$dllText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($dll))
+if ($dllText -match '_[/\\]obj[/\\]Release') { 'mapped: ok' } else { 'UNMAPPED - do not push' }
+
+$pdb = 'bin\Release\net10.0\CliUtils.pdb'
+$pdbText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($pdb))
+foreach ($m in [regex]::Matches($pdbText, '[\x20-\x7E]{8,}')) {
+  if ($m.Value -match '[/\\](obj|bin|src)[/\\]' -and $m.Value -notmatch '^_/') { "inspect: $($m.Value)" }
+}
+```
+
+Expected: `mapped: ok`, and no `inspect:` lines. The CodeView record reads
+`/_/obj/Release/net10.0/CliUtils.pdb` — the drive or mount root replaced by `_`.
+
+State on 2026-11: after the three properties were added, a clean rebuild produced a byte-identical
+assembly twice (same SHA-256), the CodeView record read `/_/obj/Release/net10.0/CliUtils.pdb`, and a
+scan of every entry in both `.nupkg` and `.snupkg` found no absolute path. Re-run the check above
+after touching any build property, because losing the mapping is silent.
+
 ## One-time setup - API key (only for publishing by hand)
 
 1. A nuget.org account.
@@ -39,7 +76,7 @@ resolved instead of this one.
 
 ```bash
 # On a machine where $HOME is read-only - the agent sandbox on this box - redirect the package
-# caches first by sourcing sandbox-env.sh from the umbrella repository's local_dev/scripts/.
+# caches first by sourcing sandbox-env.sh from this repository's local_dev/scripts/.
 source local_dev/scripts/sandbox-env.sh
 
 dotnet pack -c Release

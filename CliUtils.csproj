@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -14,6 +14,18 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!-- Reproducible build with redacted paths. Both properties are needed and neither is the
+         SDK default: without them the assembly embeds the build machine's absolute PDB path in its
+         CodeView debug record, and that path then ships inside the published package. The build
+         itself is deterministic already; what was missing was path redaction.
+           Deterministic                 same inputs produce a byte-identical assembly
+           ContinuousIntegrationBuild    deterministic *source* paths, so the PDB carries no layout
+           PathMap                       maps the checkout root to a fixed placeholder
+         Verify after packing: no absolute path may survive in the DLL. See PUBLISHING.md. -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <PathMap>$(MSBuildProjectDirectory)=/_/</PathMap>
 
     <!-- NuGet package metadata. The id is prefixed because plain `CliUtils` is taken on
          nuget.org; the version is bumped deliberately per release. -->
