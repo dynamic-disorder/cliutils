@@ -6,7 +6,7 @@ A shared .NET 10 class library providing enhanced console output utilities for C
 
 - **ConsoleColorHelper** — Static helper for colored console output (success/green, error/red, warning/yellow, info/cyan, debug/gray). Includes dedicated methods for displaying translation pairs and file operation results with color-coding.
 - **ConsoleHelper** — Backward-compatible wrapper around Spectre.Console's `AnsiConsole`, providing the same color methods with markup escaping.
-- **ConsoleLogger** — Simple in-memory logger that captures log entries with timestamps and categories.
+- **ConsoleLogger** — In-memory log list: `WriteLine` appends a `ConsoleLogEntry` holding the text. It writes nothing to the console and stores no timestamp.
 - **RichConsole** — Advanced console rendering using Spectre.Console for rich text formatting.
 
 ## Dependencies
