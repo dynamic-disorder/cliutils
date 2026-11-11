@@ -8,7 +8,7 @@
 | **DoD** | A session can build, change the public surface safely, commit through the gate, and explain any file under `.agents/` without reading the git history. |
 | **Top risk** | Changing the public API without a version bump, so the consumer in the prototype-k umbrella keeps restoring the old build from nuget.org and reports the change as broken. |
 
-Loaded automatically by DSH as workspace instructions for anything under `cliutils/`.
+Loaded automatically as workspace instructions for anything under `cliutils/`.
 
 ## What this repository is
 
@@ -24,10 +24,8 @@ The only consumer is the **prototype-k** umbrella (`prototype-k/CsvTranslations/
 | :--- | :--- |
 | `ConsoleColorHelper.cs`, `ConsoleHelper.cs`, `ConsoleLogger.cs`, `RichConsole.cs` | The entire public surface |
 | `.agents/skills/` | Seven tracked, tool-neutral skills (build-verify, conventions, refactor, explain, commit, investigate, spike) |
-| `.agents/hooks/pre-commit-build-check.sh` | The build gate — one file, two entry points |
-| `.agents/settings.json` | PreToolUse wiring for the hook, in Claude Code's settings format |
+| `.agents/hooks/pre-commit-build-check.sh` | The build gate — one file, one entry point |
 | `.github/workflows/publish.yml` | Tag-triggered Trusted Publishing |
-| `.github/copilot-instructions.md`, `.clinerules` | The Copilot and Cline instruction surfaces |
 | `local_dev/scripts/sandbox-env.sh` | Redirects tool caches for a read-only `$HOME` |
 | `local_user_files/` | Git-ignored scratch; investigations and spikes are written here |
 
@@ -55,7 +53,7 @@ The project carries no `Directory.Build.props` and no `Directory.Packages.props`
 
 ## The commit gate
 
-`git config core.hooksPath` is `.githooks`, so every commit runs `.githooks/pre-commit`, a two-line wrapper that execs `.agents/hooks/pre-commit-build-check.sh`. The same script also serves as a harness `PreToolUse` hook, wired in `.agents/settings.json` with the matcher `bash|Bash`.
+`git config core.hooksPath` is `.githooks`, so every commit runs `.githooks/pre-commit`, a two-line wrapper that execs `.agents/hooks/pre-commit-build-check.sh`. The git hook is the only entry point; there is no harness hook to rely on.
 
 Behaviour worth knowing before committing:
 
@@ -65,7 +63,7 @@ Behaviour worth knowing before committing:
 - A read-only workspace makes it warn and allow, rather than block on `MSB3061`.
 - In harness mode it checks `.cwd` against `CLAUDE_PROJECT_DIR`, so the bridge's process-wide mount does not build this repository from another workspace.
 
-`.agents/settings.json` is only effective if a harness is explicitly pointed at it — Claude Code looks in `.claude/`, which no longer exists. The git path above works regardless, so never treat the settings file as the gate.
+The git hook above is the gate that always runs; there is no settings file to arm.
 
 Both scripts must keep their executable bit (`100755` in the git index). They were stored `100644`, which is invisible on Windows — where MSYS marks every file executable — and fatal on Linux: git skips a non-executable hook without a message, and the wrapper's `[ -x "$gate" ]` test would exit 0. Check with `git ls-files -s .githooks .agents/hooks` after any move.
 
@@ -118,12 +116,10 @@ When a build property changes, re-run the path-redaction check in `PUBLISHING.md
 | `ConsoleLogger` "captures log entries with timestamps and categories" (README, and this file's predecessor) | `ConsoleLogEntry` holds one string and nothing else | Correct the description where it appears; do not add fields without a version bump |
 | Consumers are the `CsvTranslations/` apps "in this repository", built by `CsvTranslations.sln` | No solution and no `CsvTranslations` here; the consumer is the prototype-k umbrella, restored from nuget.org | Treat prototype-k as the consumer |
 | `sandbox-env.sh` usage shows `./local_dev/scripts/build-all-linux.sh --test` | That script does not exist in this repository | Ignore the example; run `dotnet build` directly |
-| A `.claude/` directory is expected | Merged into `.agents/` and deleted; `.claudeignore` remains and is still read from the project root | Keep `.claudeignore`; do not recreate `.claude/` |
-| `.agents/settings.json` looks like it arms the hook | No harness reads that path by default | Rely on `.githooks`, which is active |
 | `bin/` and `obj/` exist in the working tree | Git-ignored build output | Never stage, never delete as cleanup |
 
 ## Where work is recorded
 
 Investigations (`issue-investigate`) and research (`spike`) write dated Markdown into `local_user_files/`, which is git-ignored except for its README. Nothing durable belongs there — promote anything worth keeping into the repository proper. A finding that only the owner can confirm stays an open item in the reply, not a claim in a file.
 
-Documentation: this file replaces `CLAUDE.md` as the agent entry point. `.clinerules`, `.gitignore`, `.githooks/pre-commit` and `.agents/settings.json` were repointed from `.claude/` to `.agents/`; no other document changed.
+Documentation: this file is the only instruction surface. The per-tool files (`.clinerules`, `.claudeignore`, `.github/copilot-instructions.md`, `.agents/settings.json`) were removed on 2026-11-11 so nothing duplicates it.
