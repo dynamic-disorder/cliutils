@@ -4,8 +4,8 @@
 | :--- | :--- |
 | **Need** | A session that lands here cold: what this library is, how to build it, where the agent configuration now lives, and which documented claims are no longer true of the code. |
 | **Why** | The repository is a published NuGet package with a live commit gate. A wrong assumption either blocks a commit or ships a package whose consumers break. |
-| **What** | The single project, the build and pack commands, the `.agents/` configuration, the real public API, the commit gate's behaviour, and the doc drift already found. Deliberately not repeated: `PUBLISHING.md`, which owns the release procedure. |
-| **DoD** | A session can build, change the public surface safely, commit through the gate, and explain any file under `.agents/` without reading the git history. |
+| **What** | The single project, the build and pack commands, the machine-level agent configuration it relies on, the real public API, the commit gate's behaviour, and the doc drift already found. Deliberately not repeated: `PUBLISHING.md`, which owns the release procedure. |
+| **DoD** | A session can build, change the public surface safely, commit through the gate, and say where the gate and the skills come from without reading the git history. |
 | **Top risk** | Changing the public API without a version bump, so the consumer in the prototype-k umbrella keeps restoring the old build from nuget.org and reports the change as broken. |
 
 Loaded automatically as workspace instructions for anything under `cliutils/`.
@@ -23,8 +23,6 @@ The only consumer is the **prototype-k** umbrella (`prototype-k/CsvTranslations/
 | Path | Holds |
 | :--- | :--- |
 | `ConsoleColorHelper.cs`, `ConsoleHelper.cs`, `ConsoleLogger.cs`, `RichConsole.cs` | The entire public surface |
-| `.agents/skills/` | Seven tracked, tool-neutral skills (build-verify, conventions, refactor, explain, commit, investigate, spike) |
-| `.agents/hooks/pre-commit-build-check.sh` | The build gate — one file, one entry point |
 | `.github/workflows/publish.yml` | Tag-triggered Trusted Publishing |
 | `local_dev/scripts/sandbox-env.sh` | Redirects tool caches for a read-only `$HOME` |
 | `local_user_files/` | Git-ignored scratch; investigations and spikes are written here |
@@ -53,19 +51,17 @@ The project carries no `Directory.Build.props` and no `Directory.Packages.props`
 
 ## The commit gate
 
-`git config core.hooksPath` is `.githooks`, so every commit runs `.githooks/pre-commit`, a two-line wrapper that execs `.agents/hooks/pre-commit-build-check.sh`. The git hook is the only entry point; there is no harness hook to rely on.
+The gate is machine-level. `core.hooksPath` is set globally to `~/.agents/githooks`, a link into the
+prototype-k checkout, so every commit here runs that hook: `scripts/scan-publication-leaks.sh` first,
+then `.agents/hooks/pre-commit-build-check.sh`. This repository carries no hook file of its own — a
+fresh clone is gated by being on the machine.
 
 Behaviour worth knowing before committing:
 
-- It exits 0 immediately unless something staged matches `.cs`, `.csproj`, `.props` or `.targets` — a docs-only commit costs nothing.
+- It exits 0 immediately unless something staged matches `.cs`, `.csproj`, `.props`, `.targets`, `.sln` or `.slnx` — a docs-only commit costs nothing.
 - With no `.sln` in the repository it falls back to the project and builds that, so it does gate here. That was a defect once: a single-project repository used to pass silently.
 - Exit 2 blocks the commit and returns stderr as the reason. It retries a failed build once, because `--no-incremental` can lose a race with the Windows file lock.
 - A read-only workspace makes it warn and allow, rather than block on `MSB3061`.
-- In harness mode it checks `.cwd` against `CLAUDE_PROJECT_DIR`, so the bridge's process-wide mount does not build this repository from another workspace.
-
-The git hook above is the gate that always runs; there is no settings file to arm.
-
-Both scripts must keep their executable bit (`100755` in the git index). They were stored `100644`, which is invisible on Windows — where MSYS marks every file executable — and fatal on Linux: git skips a non-executable hook without a message, and the wrapper's `[ -x "$gate" ]` test would exit 0. Check with `git ls-files -s .githooks .agents/hooks` after any move.
 
 ## Public API
 
@@ -102,7 +98,6 @@ Commit subjects are Conventional Commits, imperative, under 50 characters. The `
 
 ```bash
 dotnet build CliUtils.csproj --no-incremental   # exit 0; report every error with file and line
-bash -n .agents/hooks/pre-commit-build-check.sh # syntax only, no execution
 ```
 
 To confirm a refactor did not leak into the tree, also run `git status --short` and check that no `bin/`, `obj/` or `local_user_files/` path is staged.
